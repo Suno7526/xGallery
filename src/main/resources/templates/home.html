@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>XGallery 홈</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .user-name { color: #93c5fd; font-weight: bold; }
+        .logout { color: white; text-decoration: none; background: #1e293b; padding: 8px 12px; border-radius: 8px; }
+        .panel { background: #111827; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 18px; }
+        form { display: flex; gap: 12px; flex-wrap: wrap; }
+        input { flex: 1; min-width: 220px; padding: 12px 10px; border-radius: 10px; border: 1px solid #475569; background: #0f172a; color: #e2e8f0; }
+        button { padding: 12px 18px; border: 0; border-radius: 10px; background: #3b82f6; color: white; font-weight: bold; cursor: pointer; }
+        .list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .item { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; }
+        .item h3 { margin: 0 0 3px; font-size: 0.95rem; }
+        .item small { color: #94a3b8; }
+        .timeline-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+        .timeline { min-width: 0; }
+        .timeline h3 { margin: 0 0 8px; }
+        .timeline iframe { width: 100% !important; }
+        .profile-link { color: #93c5fd; }
+        .alert { padding: 10px; border-radius: 10px; margin-bottom: 18px; }
+        .alert.error { background: #450a0a; color: #fecaca; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <h1>XGallery</h1>
+            <div>
+                <span class="user-name" th:text="${username}"></span>
+                <a class="logout" th:href="@{/logout}">로그아웃</a>
+            </div>
+        </div>
+
+        <div th:if="${errorMessage}" class="alert error" th:text="${errorMessage}"></div>
+
+        <div class="panel">
+            <h2>내가 가져올 X 사용자 ID 입력</h2>
+            <form th:action="@{/home/x-users}" method="post">
+                <input type="text" name="screenName" placeholder="예: twitterdev" required>
+                <button type="submit">사용자 등록</button>
+            </form>
+        </div>
+
+        <div class="panel">
+            <h2>등록한 X 사용자 리스트</h2>
+            <div class="list" th:if="${not #lists.isEmpty(xUsers)}">
+                <div class="item" th:each="xUser : ${xUsers}">
+                    <h3 th:text="${xUser.screenName}">@username</h3>
+                    <small>등록일: <span th:text="${#temporals.format(xUser.createdAt, 'yyyy-MM-dd')}"></span></small>
+                </div>
+            </div>
+            <p th:if="${#lists.isEmpty(xUsers)}">아직 등록한 X 사용자가 없습니다.</p>
+        </div>
+
+        <section class="panel">
+            <h2>등록한 사용자의 게시물</h2>
+            <div class="timeline-list" th:if="${not #lists.isEmpty(xUsers)}">
+                <article class="timeline" th:each="xUser : ${xUsers}">
+                    <h3 th:text="${xUser.screenName}">@username</h3>
+                    <a class="twitter-timeline"
+                       th:href="|https://twitter.com/${xUser.screenName}?ref_src=twsrc%5Etfw|"
+                       data-theme="dark" data-height="520">게시물을 불러오는 중입니다...</a>
+                    <p><a class="profile-link" th:href="|https://x.com/${xUser.screenName}|" target="_blank" rel="noopener">X 프로필에서 보기</a></p>
+                </article>
+            </div>
+            <p th:if="${#lists.isEmpty(xUsers)}">먼저 X 사용자를 등록해 주세요.</p>
+        </section>
+    </div>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+</body>
+</html>

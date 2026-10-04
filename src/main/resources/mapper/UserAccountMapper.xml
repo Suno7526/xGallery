@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.xGallery.mapper.UserAccountMapper">
+    <resultMap id="userAccountMap" type="com.example.xGallery.domain.UserAccount">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="email" column="email"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.example.xGallery.domain.UserAccount">
+        INSERT INTO user_account (username, password, email)
+        VALUES (#{username}, #{password}, #{email})
+    </insert>
+
+    <select id="findByUsername" resultMap="userAccountMap">
+        SELECT id, username, password, email
+        FROM user_account
+        WHERE username = #{username}
+    </select>
+
+    <select id="existsByUsername" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM user_account
+        WHERE username = #{username}
+    </select>
+
+    <select id="existsByEmail" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM user_account
+        WHERE email = #{email}
+    </select>
+</mapper>
