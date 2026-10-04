@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.xGallery.domain.UserAccount;
 import com.example.xGallery.domain.XUserProfile;
+import com.example.xGallery.mapper.GalleryPostMapper;
 import com.example.xGallery.mapper.XUserProfileMapper;
 
 @Service
@@ -14,10 +15,16 @@ public class XUserProfileService {
 
     private final UserAccountService userAccountService;
     private final XUserProfileMapper xUserProfileMapper;
+    private final GalleryPostMapper galleryPostMapper;
 
-    public XUserProfileService(UserAccountService userAccountService, XUserProfileMapper xUserProfileMapper) {
+    public XUserProfileService(
+        UserAccountService userAccountService,
+        XUserProfileMapper xUserProfileMapper,
+        GalleryPostMapper galleryPostMapper
+    ) {
         this.userAccountService = userAccountService;
         this.xUserProfileMapper = xUserProfileMapper;
+        this.galleryPostMapper = galleryPostMapper;
     }
 
     @Transactional
@@ -46,5 +53,22 @@ public class XUserProfileService {
         UserAccount userAccount = userAccountService.findByUsername(username)
             .orElseThrow(() -> new IllegalArgumentException("로그인된 사용자를 찾을 수 없습니다."));
         return xUserProfileMapper.findByUserAccountIdOrderByCreatedAtDesc(userAccount.getId());
+    }
+
+    @Transactional
+    public void delete(String username, Long profileId) {
+        UserAccount userAccount = userAccountService.findByUsername(username)
+            .orElseThrow(() -> new IllegalArgumentException("로그인된 사용자를 찾을 수 없습니다."));
+        boolean profileBelongsToUser = xUserProfileMapper.findByUserAccountIdOrderByCreatedAtDesc(userAccount.getId())
+            .stream()
+            .anyMatch(profile -> profile.getId().equals(profileId));
+        if (!profileBelongsToUser) {
+            throw new IllegalArgumentException("등록된 X 사용자를 찾을 수 없습니다.");
+        }
+
+        galleryPostMapper.deleteByXUserProfileId(profileId);
+        if (xUserProfileMapper.deleteByIdAndUserAccountId(profileId, userAccount.getId()) != 1) {
+            throw new IllegalStateException("X 사용자 삭제에 실패했습니다.");
+        }
     }
 }

@@ -12,4 +12,5 @@ public interface XUserProfileMapper {
     int insert(XUserProfile profile);
     List<XUserProfile> findByUserAccountIdOrderByCreatedAtDesc(@Param("userAccountId") Long userAccountId);
     boolean existsByUserAccountIdAndScreenName(@Param("userAccountId") Long userAccountId, @Param("screenName") String screenName);
+    int deleteByIdAndUserAccountId(@Param("id") Long id, @Param("userAccountId") Long userAccountId);
 }

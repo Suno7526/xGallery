@@ -30,4 +30,10 @@
         WHERE user_account_id = #{userAccountId}
           AND screen_name = #{screenName}
     </select>
+
+    <delete id="deleteByIdAndUserAccountId">
+        DELETE FROM x_user_profile
+        WHERE id = #{id}
+          AND user_account_id = #{userAccountId}
+    </delete>
 </mapper>

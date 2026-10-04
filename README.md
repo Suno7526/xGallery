@@ -9,11 +9,15 @@ Spring Boot 기반 X 사용자 및 게시물 갤러리 프로젝트입니다.
 
 ## 실행
 
-MySQL에 `xgallery` 데이터베이스를 만든 다음, Git Bash에서 접속 정보를 환경변수로 설정합니다.
+MySQL에 `xgallery` 데이터베이스를 만든 다음, 프로젝트 루트에서 예시 파일을 복사해 `.env`를 만들고 DB 접속 정보와 X API Bearer Token을 입력합니다. `.env`는 Git에서 제외됩니다.
 
 ```bash
-export DB_URL='jdbc:mysql://localhost:3306/xgallery?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf8&serverTimezone=Asia/Seoul'
-export DB_USERNAME='your-mysql-user'
-export DB_PASSWORD='your-mysql-password'
+cp .env.example .env
 ./gradlew bootRun
 ```
+
+## 게시물 조회 및 캐시
+
+홈 화면은 페이지 진입만으로 X API를 호출하지 않습니다. 왼쪽 메뉴에서 등록된 X 사용자를 선택하고 **조회하기**를 누르면 해당 사용자의 게시물을 가져옵니다. 조회된 게시물은 사용자별 `gallery_post` 테이블에 저장되며, 다음 조회부터는 마지막으로 저장된 게시물 이후의 새 게시물만 확인합니다. 새 게시물이 없으면 기존 DB 게시물을 표시합니다.
+
+**전체 조회하기**는 등록된 모든 X 사용자의 게시물을 불러옵니다. 사용자 목록에서 **사용자 삭제**를 선택하면 해당 사용자와 저장된 게시물 캐시가 함께 삭제됩니다.

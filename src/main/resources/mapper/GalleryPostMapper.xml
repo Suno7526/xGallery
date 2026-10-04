@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.xGallery.mapper.GalleryPostMapper">
+    <resultMap id="galleryPostMap" type="com.example.xGallery.GalleryPost">
+        <constructor>
+            <arg column="tweet_id" javaType="java.lang.String"/>
+            <arg column="author" javaType="java.lang.String"/>
+            <arg column="post_text" javaType="java.lang.String"/>
+            <arg column="image_url" javaType="java.lang.String"/>
+            <arg column="tweet_created_at" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+
+    <select id="findByXUserProfileId" resultMap="galleryPostMap">
+        SELECT tweet_id, author, post_text, image_url, tweet_created_at
+        FROM gallery_post
+        WHERE x_user_profile_id = #{xUserProfileId}
+        ORDER BY tweet_created_at DESC, id DESC
+    </select>
+
+    <insert id="insert">
+        INSERT INTO gallery_post (x_user_profile_id, tweet_id, author, post_text, image_url, tweet_created_at)
+        VALUES (
+            #{xUserProfileId},
+            #{post.tweetId},
+            #{post.author},
+            #{post.text},
+            #{post.imageUrl},
+            #{post.createdAt}
+        )
+    </insert>
+
+    <update id="updateImageUrl">
+        UPDATE gallery_post
+        SET image_url = #{imageUrl}
+        WHERE x_user_profile_id = #{xUserProfileId}
+          AND tweet_id = #{tweetId}
+          AND (image_url IS NULL OR image_url = '')
+    </update>
+
+    <delete id="deleteByXUserProfileId">
+        DELETE FROM gallery_post
+        WHERE x_user_profile_id = #{xUserProfileId}
+    </delete>
+</mapper>

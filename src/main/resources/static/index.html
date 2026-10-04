@@ -83,7 +83,6 @@
     <script>
         $(function () {
             const $gallery = $('#gallery');
-            const fallbackImage = 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80';
 
             $.getJSON('/api/gallery')
                 .done(function (posts) {
@@ -95,21 +94,24 @@
                     $gallery.empty();
                     $.each(posts, function (_, post) {
                         const $card = $('<article>').addClass('card');
-                        const $image = $('<img>')
-                            .attr('src', post.imageUrl || fallbackImage)
-                            .attr('alt', post.author || '');
                         const $body = $('<div>').addClass('card-body');
                         const $author = $('<p>').addClass('author').text(post.author || '');
                         const $text = $('<p>').addClass('text').text(post.text || '');
 
+                        if (post.imageUrl) {
+                            $card.append($('<img>').attr('src', post.imageUrl).attr('alt', post.author || ''));
+                        }
                         $body.append($author, $text);
-                        $card.append($image, $body);
+                        $card.append($body);
                         $gallery.append($card);
                     });
                 })
-                .fail(function (error) {
-                    $gallery.html('<div class="loading">데이터를 불러오지 못했습니다.</div>');
-                    console.error(error);
+                .fail(function (response) {
+                    const message = response.responseJSON && response.responseJSON.message
+                        ? response.responseJSON.message
+                        : 'X 게시물을 불러오지 못했습니다. 토큰과 API 접근 권한을 확인해 주세요.';
+                    $gallery.empty().append($('<div>').addClass('loading').text(message));
+                    console.error(response);
                 });
         });
     </script>
